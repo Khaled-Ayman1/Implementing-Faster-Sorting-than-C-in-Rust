@@ -29,7 +29,7 @@ mod tests {
             println!("{:?}", expected);
 
             let ln = unsorted.len();
-            problem::giga_sort(&mut unsorted, ln as i32);
+            problem::giga_sort(&mut unsorted, ln as usize);
             println!("Returned Output:");
             println!("{:?}", unsorted);
 
@@ -47,7 +47,7 @@ mod tests {
             println!("{:?}", expected);
 
             let ln = unsorted.len();
-            problem::giga_sort(&mut unsorted, ln as i32);
+            problem::giga_sort(&mut unsorted, ln as usize);
             println!("Returned Output:");
             println!("{:?}", unsorted);
 
@@ -65,7 +65,7 @@ mod tests {
             println!("{:?}", expected);
 
             let ln = unsorted.len();
-            problem::giga_sort(&mut unsorted, ln as i32);
+            problem::giga_sort(&mut unsorted, ln as usize);
             println!("Returned Output:");
             println!("{:?}", unsorted);
 
@@ -83,7 +83,7 @@ mod tests {
             println!("{:?}", expected);
 
             let ln = unsorted.len();
-            problem::giga_sort(&mut unsorted, ln as i32);
+            problem::giga_sort(&mut unsorted, ln as usize);
             println!("Returned Output:");
             println!("{:?}", unsorted);
 
@@ -101,7 +101,7 @@ mod tests {
             println!("{:?}", expected);
 
             let ln = unsorted.len();
-            problem::giga_sort(&mut unsorted, ln as i32);
+            problem::giga_sort(&mut unsorted, ln as usize);
             println!("Returned Output:");
             println!("{:?}", unsorted);
 
@@ -157,7 +157,7 @@ mod tests {
             );
 
             let start2 = Instant::now();
-            problem::giga_sort(&mut arr, array_size);
+            problem::giga_sort(&mut arr, array_size as usize);
             let end2 = Instant::now();
             let elapsed_time2 = end2 - start2;
             println!(
@@ -226,7 +226,7 @@ mod tests {
             );
 
             let start2 = Instant::now();
-            problem::giga_sort(&mut arr, array_size);
+            problem::giga_sort(&mut arr, array_size as usize);
             let end2 = Instant::now();
             let elapsed_time2 = end2 - start2;
             println!("Time taken: {}", elapsed_time2.as_millis());
