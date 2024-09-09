@@ -9,8 +9,8 @@ pub fn giga_sort(arr: &mut Vec<f32>, size: usize) -> &mut Vec<f32> {
     return arr;
 }
 fn quick_sort(arr: &mut Vec<f32>, start: usize, end: usize, threshold: usize) -> () {
-    if (start < end) {
-        if ((end - start) + 1 <= threshold) {
+    if start < end {
+        if (end - start) + 1 <= threshold {
             insertion_sort(arr, start, end);
         } else {
             let pivot_index: usize = divide(arr, start, end);
@@ -28,25 +28,25 @@ fn quick_sort(arr: &mut Vec<f32>, start: usize, end: usize, threshold: usize) ->
 
 fn divide(arr: &mut Vec<f32>, start: usize, end: usize) -> usize {
     let pivot: f32 = arr[end];
-    let mut swapOut: usize = start - 1;
+    let mut swap_out: usize = start - 1;
 
     for left in start..end {
-        if (arr[left] <= pivot) {
-            swapOut += 1;
-            swap(arr, left, swapOut);
+        if arr[left] <= pivot {
+            swap_out += 1;
+            swap(arr, left, swap_out);
         }
     }
 
-    swap(arr, swapOut + 1, end);
-    return swapOut + 1;
+    swap(arr, swap_out + 1, end);
+    return swap_out + 1;
 }
 
 fn insertion_sort(arr: &mut Vec<f32>, start: usize, end: usize) -> () {
-    for i in start + 1..end + 1 {
+    for i in start + 1..=end {
         let index: f32 = arr[i];
         let mut j: usize = i - 1;
 
-        while (j >= start && arr[j] > index) {
+        while j >= start && arr[j] > index {
             arr[j + 1] = arr[j];
             j -= 1;
         }
