@@ -1,62 +1,90 @@
+use crossbeam::thread;
 /// <summary>
 /// Sort the given array in ascending order
 /// At least, should beat the default sorting algorithm of the Rust sort
 /// </summary>
 /// <param name="arr"> array to be sorted in ascending order </param>
 /// <param name="size"> array size </param>
+///
 pub fn giga_sort(arr: &mut Vec<f32>, size: usize) -> &mut Vec<f32> {
-    quick_sort(arr, 0, size - 1, 200);
+    quick_sort(arr as &mut [f32], 0, size - 1);
     return arr;
 }
-fn quick_sort(arr: &mut Vec<f32>, start: usize, end: usize, threshold: usize) -> () {
+
+const THRESHOLD: usize = 170;
+
+fn quick_sort(arr: &mut [f32], start: usize, end: usize) -> () {
     if start < end {
-        if (end - start) + 1 <= threshold {
-            insertion_sort(arr, start, end);
+        let pivot_index: usize = divide(arr, start, end);
+
+        if (end - start) > THRESHOLD {
+            thread::scope(|s| {
+                let (first_half, second_half) = arr.split_at_mut(pivot_index);
+
+                s.spawn(move |_| {
+                    quick_sort(first_half, start, pivot_index - 1);
+                });
+                s.spawn(move |_| {
+                    quick_sort(second_half, 1, end - pivot_index - 1);
+                });
+            })
+            .unwrap();
         } else {
-            let pivot_index: usize = divide(arr, start, end);
+            for i in start + 1..=end {
+                let key: f32 = arr[i];
+                let mut j: usize = i - 1;
 
-            quick_sort(arr, start, pivot_index - 1, threshold);
-            quick_sort(arr, pivot_index + 1, end, threshold);
+                while j >= start && arr[j] > key {
+                    arr[j + 1] = arr[j];
 
-            // Parallel.Invoke(
-            // () => QuickSort(arr, start, pivotIndex - 1, threshold),
-            // () => QuickSort(arr, pivotIndex + 1, end, threshold)
-            // );
+                    if j == 0 {
+                        break;
+                    }
+                    j -= 1;
+                }
+
+                arr[j + 1] = key;
+            }
         }
     }
 }
 
-fn divide(arr: &mut Vec<f32>, start: usize, end: usize) -> usize {
-    let pivot: f32 = arr[end];
-    let mut swap_out: usize = start - 1;
+fn divide(arr: &mut [f32], start: usize, end: usize) -> usize {
+    let mid: usize = (start + end) / 2;
 
-    for left in start..end {
-        if arr[left] <= pivot {
-            swap_out += 1;
-            swap(arr, left, swap_out);
+    if arr[start] > arr[mid] {
+        arr.swap(start, mid);
+    }
+
+    if arr[start] > arr[end] {
+        arr.swap(start, end);
+    }
+
+    if arr[mid] > arr[end] {
+        arr.swap(mid, end);
+    }
+
+    let pivot: f32 = arr[mid];
+    arr[mid] = arr[start];
+    arr[start] = pivot;
+
+    let mut leftmark: usize = start + 1;
+    let mut rightmark: usize = end;
+
+    while leftmark <= rightmark {
+        while leftmark <= rightmark && arr[leftmark] <= pivot {
+            leftmark += 1;
+        }
+        while rightmark >= leftmark && arr[rightmark] >= pivot {
+            rightmark -= 1;
+        }
+
+        if leftmark <= rightmark {
+            (arr[rightmark], arr[leftmark]) = (arr[leftmark], arr[rightmark]);
         }
     }
 
-    swap(arr, swap_out + 1, end);
-    return swap_out + 1;
-}
+    arr.swap(start, rightmark);
 
-fn insertion_sort(arr: &mut Vec<f32>, start: usize, end: usize) -> () {
-    for i in start + 1..=end {
-        let index: f32 = arr[i];
-        let mut j: usize = i - 1;
-
-        while j >= start && arr[j] > index {
-            arr[j + 1] = arr[j];
-            j -= 1;
-        }
-
-        arr[j + 1] = index;
-    }
-}
-
-fn swap(array: &mut Vec<f32>, i: usize, j: usize) -> () {
-    let temp: f32 = array[i];
-    array[i] = array[j];
-    array[j] = temp;
+    return rightmark;
 }

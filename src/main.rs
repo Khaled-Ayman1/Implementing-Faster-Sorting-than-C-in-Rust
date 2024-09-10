@@ -1,7 +1,6 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Error, Read};
 use std::time::{Duration, Instant};
-
 mod problem;
 
 #[cfg(test)]
