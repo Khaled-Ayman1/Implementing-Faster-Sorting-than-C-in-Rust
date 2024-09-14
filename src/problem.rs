@@ -1,4 +1,4 @@
-use crossbeam::thread;
+use rayon::join;
 /// <summary>
 /// Sort the given array in ascending order
 /// At least, should beat the default sorting algorithm of the Rust sort
@@ -11,35 +11,32 @@ pub fn giga_sort(arr: &mut Vec<f32>, size: usize) -> &mut Vec<f32> {
     return arr;
 }
 
-const THRESHOLD: usize = 170;
+const THRESHOLD: usize = 200;
 
 fn quick_sort(arr: &mut [f32], start: usize, end: usize) -> () {
     if start < end {
-        let pivot_index: usize = divide(arr, start, end);
+        let mut pivot_index: usize = divide(arr, start, end);
+
+        if pivot_index < (arr.len() / 2) as usize {
+            pivot_index += 1;
+        }
 
         if (end - start) > THRESHOLD {
-            thread::scope(|s| {
-                let (first_half, second_half) = arr.split_at_mut(pivot_index);
-
-                s.spawn(move |_| {
-                    quick_sort(first_half, start, pivot_index - 1);
-                });
-                s.spawn(move |_| {
-                    quick_sort(second_half, 1, end - pivot_index - 1);
-                });
-            })
-            .unwrap();
+            let (first_half, second_half) = arr.split_at_mut(pivot_index);
+            join(
+                || quick_sort(first_half, 0, first_half.len() - 1),
+                || quick_sort(second_half, 0, second_half.len() - 1),
+            );
         } else {
-            for i in start + 1..=end {
-                let key: f32 = arr[i];
-                let mut j: usize = i - 1;
+            let mut key;
+            let mut j;
+            for i in start + 1..end + 1 {
+                key = arr[i];
+                j = i - 1;
 
                 while j >= start && arr[j] > key {
                     arr[j + 1] = arr[j];
 
-                    if j == 0 {
-                        break;
-                    }
                     j -= 1;
                 }
 
@@ -86,5 +83,5 @@ fn divide(arr: &mut [f32], start: usize, end: usize) -> usize {
 
     arr.swap(start, rightmark);
 
-    return rightmark;
+    rightmark
 }
