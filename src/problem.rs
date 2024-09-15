@@ -28,19 +28,12 @@ fn quick_sort(arr: &mut [f32], start: usize, end: usize) -> () {
                 || quick_sort(second_half, 0, second_half.len() - 1),
             );
         } else {
-            let mut key;
-            let mut j;
-            for i in start + 1..end + 1 {
-                key = arr[i];
-                j = i - 1;
-
-                while j >= start && arr[j] > key {
-                    arr[j + 1] = arr[j];
-
+            for i in start + 1..=end {
+                let mut j = i;
+                while j > start && arr[j] < arr[j - 1] {
+                    arr.swap(j, j - 1);
                     j -= 1;
                 }
-
-                arr[j + 1] = key;
             }
         }
     }
